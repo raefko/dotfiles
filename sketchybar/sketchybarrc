@@ -1,0 +1,187 @@
+#!/usr/bin/env bash
+
+# ============================================================
+# SketchyBar Config — Powerline items + AeroSpace
+# Theme: rounded pill bar from sketchybarrc
+# ============================================================
+
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+
+CONFIG_DIR="${CONFIG_DIR:-$HOME/.config/sketchybar}"
+PLUGIN_DIR="$CONFIG_DIR/plugins"
+ITEM_DIR="$CONFIG_DIR/items"
+
+#### Import Colors ####
+source "$CONFIG_DIR/colors.sh"  # Provides BAR_COLOR, ITEM_BG_COLOR, ACCENT_COLOR, WHITE
+
+##### Bar Appearance #####
+sketchybar --bar \
+    position=top \
+    height=40 \
+    corner_radius=30 \
+    color="$BAR_COLOR" \
+    margin=0 \
+    y_offset=0 \
+    padding_left=0 \
+    padding_right=0 \
+    shadow=off \
+    sticky=on \
+    topmost=window
+
+##### Changing Defaults #####
+default=(
+  padding_left=5
+  padding_right=5
+  icon.font="Hack Nerd Font:Bold:17.0"
+  label.font="SF Pro:Semibold:17.0"
+  icon.color=$TEXT
+  label.color=$TEXT
+  icon.padding_left=4
+  icon.padding_right=4
+  label.padding_left=4
+  label.padding_right=4
+  updates=on
+)
+sketchybar --default "${default[@]}"
+
+# ===================================================================
+# LEFT SIDE: AeroSpace Workspaces
+# ===================================================================
+
+sketchybar --add event aerospace_workspace_change
+
+# Dynamically discover workspaces per monitor.
+# %{monitor-appkit-nsscreen-screens-id} is the ID sketchybar uses for display=
+while IFS=' ' read -r ws_id monitor_id appkit_id; do
+    [ -z "$ws_id" ] && continue
+    sketchybar --add item space."$ws_id" left \
+        --subscribe space."$ws_id" aerospace_workspace_change \
+        --set space."$ws_id" \
+            display="$appkit_id" \
+            icon="$ws_id" \
+            icon.font="SF Pro:Bold:14.0" \
+            icon.color=$TEXT \
+            icon.padding_left=10 \
+            icon.padding_right=4 \
+            label="" \
+            label.font="SF Pro:Regular:11.0" \
+            label.color=$SUBTEXT \
+            label.padding_left=0 \
+            label.padding_right=10 \
+            background.color=$WS_WINDOWS_BG \
+            background.corner_radius=5 \
+            background.drawing=on \
+            background.height=25 \
+            drawing=off \
+            click_script="aerospace workspace $ws_id" \
+            script="$PLUGIN_DIR/aerospace.sh $ws_id $monitor_id"
+done < <(aerospace list-workspaces --all \
+    --format "%{workspace} %{monitor-id} %{monitor-appkit-nsscreen-screens-id}" 2>/dev/null)
+
+# -----------------------------------------------------------
+# LEFT: Separator + Focused window title
+# -----------------------------------------------------------
+sketchybar --add item sep.left left \
+    --set sep.left \
+        icon="│" \
+        icon.font="Hack Nerd Font:Regular:17.0" \
+        icon.color=$SURFACE1 \
+        icon.padding_left=4 \
+        icon.padding_right=4 \
+        label.drawing=off \
+        background.drawing=off
+
+sketchybar --add item window_title left \
+    --subscribe window_title front_app_switched \
+    --set window_title \
+        icon.drawing=off \
+        label.font="SF Pro:Semibold:13.0" \
+        label.color=$SUBTEXT \
+        label.padding_left=4 \
+        label.max_chars=50 \
+        background.drawing=off \
+        script="$PLUGIN_DIR/window_title.sh"
+
+# ===================================================================
+# RIGHT SIDE: clock, battery, wifi, cpu, volume
+# ===================================================================
+
+sketchybar --add item clock right \
+    --set clock \
+        icon="󰥔" \
+        icon.color=$TEXT \
+        icon.padding_left=8 \
+        label.color=$TEXT \
+        label.padding_right=8 \
+        background.color=$ITEM_BG_COLOR \
+        background.drawing=on \
+        background.corner_radius=5 \
+        background.height=25 \
+        update_freq=30 \
+        script="$PLUGIN_DIR/clock.sh"
+
+sketchybar --add item battery right \
+    --subscribe battery system_woke power_source_change \
+    --set battery \
+        icon="󰂄" \
+        icon.color=$TEXT \
+        icon.padding_left=8 \
+        label.color=$TEXT \
+        label.padding_right=8 \
+        background.color=$ITEM_BG_COLOR \
+        background.drawing=on \
+        background.corner_radius=5 \
+        background.height=25 \
+        update_freq=120 \
+        script="$PLUGIN_DIR/battery.sh"
+
+sketchybar --add item wifi right \
+    --subscribe wifi wifi_change \
+    --set wifi \
+        icon="󰖩" \
+        icon.color=$TEXT \
+        icon.padding_left=8 \
+        label.color=$TEXT \
+        label.padding_right=8 \
+        background.color=$ITEM_BG_COLOR \
+        background.drawing=on \
+        background.corner_radius=5 \
+        background.height=25 \
+        script="$PLUGIN_DIR/wifi.sh"
+
+sketchybar --add item cpu right \
+    --set cpu \
+        icon="󰻠" \
+        icon.color=$TEXT \
+        icon.padding_left=8 \
+        label.color=$TEXT \
+        label.padding_right=8 \
+        background.color=$ITEM_BG_COLOR \
+        background.drawing=on \
+        background.corner_radius=5 \
+        background.height=25 \
+        update_freq=5 \
+        script="$PLUGIN_DIR/cpu.sh"
+
+sketchybar --add item volume right \
+    --subscribe volume volume_change \
+    --set volume \
+        icon="󰕾" \
+        icon.color=$TEXT \
+        icon.padding_left=8 \
+        label.color=$TEXT \
+        label.padding_right=8 \
+        background.color=$ITEM_BG_COLOR \
+        background.drawing=on \
+        background.corner_radius=5 \
+        background.height=25 \
+        script="$PLUGIN_DIR/volume.sh"
+
+##### Force all scripts to run the first time #####
+sketchybar --update
+
+# Trigger initial workspace state
+FOCUSED=$(aerospace list-workspaces --focused 2>/dev/null)
+if [ -n "$FOCUSED" ]; then
+    sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE="$FOCUSED"
+fi

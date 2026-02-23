@@ -1,0 +1,155 @@
+# ============================================================
+# AeroSpace Config — i3-style for macOS Tahoe
+# Place at: ~/.aerospace.toml
+# ============================================================
+
+config-version = 2
+
+start-at-login = true
+after-login-command = []
+after-startup-command = []
+
+enable-normalization-flatten-containers = true
+enable-normalization-opposite-orientation-for-nested-containers = true
+
+on-focus-changed = ['move-mouse window-lazy-center']
+on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
+
+default-root-container-layout = 'tiles'
+default-root-container-orientation = 'auto'
+accordion-padding = 30
+
+# Notify SketchyBar on workspace change
+exec-on-workspace-change = [
+    '/bin/bash', '-c',
+    'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE'
+]
+
+# -----------------------------------------------------------
+# Gaps (i3-gaps style)
+# -----------------------------------------------------------
+[gaps]
+inner.horizontal = 8
+inner.vertical   = 8
+outer.left       = 8
+outer.right      = 8
+outer.bottom     = 8
+outer.top        = [{ monitor."Sidecar Display" = 35 }, 0]
+
+# -----------------------------------------------------------
+# Main Mode Bindings (Alt as Mod)
+# -----------------------------------------------------------
+[mode.main.binding]
+
+alt-shift-g = [
+    'exec-and-forget sketchybar --bar hidden=toggle',
+    'enable toggle'
+]
+# Focus
+alt-ctrl-left  = 'focus left'
+alt-ctrl-down  = 'focus down'
+alt-ctrl-up    = 'focus up'
+alt-ctrl-right = 'focus right'
+# Move windows
+alt-home     = 'move left'      # fn+left
+alt-pageDown = 'move down'      # fn+down
+alt-pageUp   = 'move up'        # fn+up
+alt-end      = 'move right'     # fn+right
+
+# Join-with (i3 split equivalent, works with normalization)
+alt-v = 'join-with down'
+alt-b = 'join-with right'
+
+# Layout toggles
+alt-e = 'layout tiles horizontal vertical'
+alt-s = 'layout accordion horizontal'
+alt-w = 'layout accordion vertical'
+
+# Fullscreen
+alt-f = 'fullscreen'
+
+# Floating toggle
+alt-shift-space = 'layout floating tiling'
+
+# Focus back and forth
+alt-space = 'focus-back-and-forth'
+
+# Kill window
+alt-shift-q = 'close'
+
+# Terminal
+alt-enter = 'exec-and-forget open -na alacritty || open -na kitty || open -na wezterm || open -a Terminal'
+
+# App launcher
+alt-d = 'exec-and-forget open -a "Raycast" || open -a "Alfred 5" || open -a "Spotlight"'
+
+# Resize mode
+alt-r = 'mode resize'
+
+# Reload config
+alt-shift-c = 'reload-config'
+
+# Workspaces
+alt-1 = 'workspace 1'
+alt-2 = 'workspace 2'
+alt-3 = 'workspace 3'
+alt-4 = 'workspace 4'
+alt-5 = 'workspace 5'
+alt-6 = 'workspace 6'
+alt-7 = 'workspace 7'
+alt-8 = 'workspace 8'
+alt-9 = 'workspace 9'
+alt-0 = 'workspace 10'
+
+# Move to workspace
+alt-shift-1 = 'move-node-to-workspace 1'
+alt-shift-2 = 'move-node-to-workspace 2'
+alt-shift-3 = 'move-node-to-workspace 3'
+alt-shift-4 = 'move-node-to-workspace 4'
+alt-shift-5 = 'move-node-to-workspace 5'
+alt-shift-6 = 'move-node-to-workspace 6'
+alt-shift-7 = 'move-node-to-workspace 7'
+alt-shift-8 = 'move-node-to-workspace 8'
+alt-shift-9 = 'move-node-to-workspace 9'
+alt-shift-0 = 'move-node-to-workspace 10'
+
+# Move workspace to monitor
+alt-shift-period = 'move-workspace-to-monitor next'
+alt-shift-comma  = 'move-workspace-to-monitor prev'
+
+# Focus monitor
+alt-comma  = 'focus-monitor prev'
+alt-period = 'focus-monitor next'
+
+# Back and forth
+alt-tab = 'workspace-back-and-forth'
+
+# -----------------------------------------------------------
+# Resize Mode
+# -----------------------------------------------------------
+[mode.resize.binding]
+h = 'resize width -50'
+j = 'resize height +50'
+k = 'resize height -50'
+l = 'resize width +50'
+shift-h = 'resize width -10'
+shift-j = 'resize height +10'
+shift-k = 'resize height -10'
+shift-l = 'resize width +10'
+enter = 'mode main'
+esc   = 'mode main'
+
+# -----------------------------------------------------------
+# Window Rules (NOTE: if.app-id with DOT not hyphen)
+# -----------------------------------------------------------
+[[on-window-detected]]
+if.app-id = 'com.apple.systempreferences'
+run = ['layout floating']
+
+[[on-window-detected]]
+if.app-id = 'com.apple.finder'
+run = ['layout floating']
+
+[[on-window-detected]]
+if.app-id = 'com.isaacmarovitz.Whisky'
+run = ['layout floating']
