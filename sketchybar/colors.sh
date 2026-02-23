@@ -9,7 +9,7 @@ export TEXT=0xffcdd6f4       # soft lavender-white (main text)
 export SUBTEXT=0xff6c7086    # muted gray-blue (secondary text)
 
 # Surfaces
-export BAR_COLOR=0xff1e1e2e     # base — very dark blue-black
+export BAR_COLOR=0x00000000     # fully transparent bar
 export ITEM_BG_COLOR=0xff313244 # surface0 — dark pill background
 export SURFACE1=0xff45475a      # surface1 — subtle borders / separators
 
