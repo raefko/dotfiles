@@ -19,11 +19,15 @@ export ACCENT_COLOR=0xff89b4fa  # sky blue
 # Workspace pill states
 export WS_FOCUSED_BG=0xff89b4fa   # solid accent — globally focused
 export WS_FOCUSED_FG=0xff1e1e2e   # dark text on accent
-export WS_VISIBLE_BG=0x8845475a   # surface1, semi-opaque — monitor-active
-export WS_VISIBLE_FG=0xffcdd6f4   # text
-export WS_WINDOWS_BG=0x44313244   # dim surface — has windows, not visible
-export WS_WINDOWS_FG=0xff6c7086   # subtext
+export WS_VISIBLE_BG=0xcc45475a   # surface1, 80% opaque — monitor-active
+export WS_VISIBLE_FG=0xffffffff   # white
+export WS_WINDOWS_BG=0xaa313244   # surface, 67% opaque — has windows, not visible
+export WS_WINDOWS_FG=0xffffffff   # white
 
-# Legacy alias (used by older plugin scripts)
+# Battery state colors (Catppuccin Mocha)
+export BATTERY_OK=0xffa6e3a1    # green  — charging or ≥60%
+export BATTERY_WARN=0xfff9e2af  # yellow — 20–59%
+export BATTERY_CRIT=0xfff38ba8  # red    — <20%
+
+# Legacy alias
 export WHITE=0xffffffff
-export ACCENT_COLOR=0xff89b4fa

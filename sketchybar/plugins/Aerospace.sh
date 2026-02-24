@@ -23,11 +23,16 @@ fi
 # This lets us highlight workspaces on inactive monitors too
 MONITOR_VISIBLE=$(aerospace list-workspaces --monitor "$MONITOR_ID" --visible 2>/dev/null)
 
-# Build app names label: unique app names, up to 3, dot-separated
+# Build app names: last word of each app name (e.g. "Google Chrome" → "Chrome"),
+# unique, up to 3, dot-separated
 APP_LABEL=$(aerospace list-windows --workspace "$SID" 2>/dev/null \
     | awk -F'|' '{gsub(/^ +| +$/, "", $2); print $2}' \
     | sort -u \
-    | awk 'NR<=3 {if(NR>1) printf " · "; printf "%s", $0} END{printf "\n"}')
+    | awk 'NR<=3 {
+        n = split($0, w, " ");
+        if(NR>1) printf " · ";
+        printf "%s", w[n]
+      } END{printf "\n"}')
 
 WIN_COUNT=$(aerospace list-windows --workspace "$SID" --count 2>/dev/null)
 HAS_WINDOWS=false
@@ -50,7 +55,7 @@ elif [ "$SID" = "$MONITOR_VISIBLE" ]; then
         background.color="$WS_VISIBLE_BG" \
         icon.color="$WS_VISIBLE_FG" \
         label="$APP_LABEL" \
-        label.color="$SUBTEXT"
+        label.color="$WS_VISIBLE_FG"
 elif [ "$HAS_WINDOWS" = true ]; then
     # Has windows but not visible: dim pill
     sketchybar --set "$NAME" \
@@ -58,7 +63,7 @@ elif [ "$HAS_WINDOWS" = true ]; then
         background.color="$WS_WINDOWS_BG" \
         icon.color="$WS_WINDOWS_FG" \
         label="$APP_LABEL" \
-        label.color="$SUBTEXT"
+        label.color="$WS_WINDOWS_FG"
 else
     # Empty: hidden
     sketchybar --set "$NAME" drawing=off
